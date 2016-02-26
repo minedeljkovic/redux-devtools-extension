@@ -1,10 +1,10 @@
 import React, { createElement } from 'react';
 import FilterMonitor from 'redux-devtools-filter-actions';
-import LogMonitor from 'redux-devtools-log-monitor';
+import LogMonitor from '@minedeljkovic/redux-devtools-log-monitor';
 import ChartMonitor from 'redux-devtools-chart-monitor';
 import SliderMonitor from 'redux-slider-monitor';
 import DiffMonitor from './DiffMonitor';
-import InspectorMonitor from 'redux-devtools-inspector';
+import InspectorMonitor from '@minedeljkovic/redux-devtools-inspector';
 
 const monitorTypes = location.hash ? location.hash.substr(1).split('/') : {};
 
