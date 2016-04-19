@@ -53,8 +53,8 @@
     "webpack": "^1.12.2"
   },
   "dependencies": {
-    "@minedeljkovic/redux-devtools-inspector": "^0.2.0",
-    "@minedeljkovic/redux-devtools-log-monitor": "^1.1.0",
+    "@minedeljkovic/redux-devtools-inspector": "^0.3.6-0",
+    "@minedeljkovic/redux-devtools-log-monitor": "^1.1.1",
     "crossmessaging": "^0.2.1",
     "jsan": "^3.1.1",
     "react": "^0.14.6",
