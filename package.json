@@ -4,8 +4,8 @@
   "description": "DevTools extension for Redux",
   "scripts": {
     "start": "gulp",
-    "build:extension": "BABEL_ENV=production gulp build:extension",
-    "build:firefox": "BABEL_ENV=production gulp build:firefox",
+    "build:extension": "cross-env BABEL_ENV=production gulp build:extension",
+    "build:firefox": "cross-env BABEL_ENV=production gulp build:firefox",
     "build:examples": "babel-node examples/buildAll.js",
     "compress:extension": "npm run build:extension && gulp compress:extension",
     "compress:firefox": "npm run build:firefox && gulp compress:firefox",
@@ -35,6 +35,7 @@
     "babel-preset-react": "^6.3.13",
     "babel-preset-stage-0": "^6.3.13",
     "chromedriver": "^2.19.0",
+    "cross-env": "^1.0.7",
     "eslint": "^1.7.1",
     "eslint-config-airbnb": "^0.1.0",
     "eslint-plugin-react": "^3.2.3",
