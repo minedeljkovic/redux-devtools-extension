@@ -8,7 +8,9 @@ chrome.runtime.getBackgroundPage( background => {
   const saveOption = e => {
     let value;
     if (e.target.type === 'checkbox') value = e.target.checked;
-    else if (e.target.type === 'input') value = Number(e.target.value);
+    else if (
+      e.target.type === 'input' || e.target.type === 'text'
+    ) value = Number(e.target.value);
     else value = e.target.value;
     syncOptions.save(e.target.id, value);
   };
@@ -47,9 +49,9 @@ chrome.runtime.getBackgroundPage( background => {
           <Monitors type="bottom" defaultValue={items.bottomMonitor} id="bottomMonitor" onChange={saveOption}/>
         </div>
         <div className="input">
-          <span className="caption">Maximum actions:</span>
-          <input id="limit" type="text" defaultValue={items.limit} onChange={saveOption}/>
-          <span className="comment">(autocommit when exceeds, 0 - no limit)</span>
+          <span className="caption">Actions history limit:</span>
+          <input id="maxAge" type="text" defaultValue={items.maxAge} onChange={saveOption}/>
+          <span className="comment">(the oldest removed once it is reached)</span>
         </div>
         <div className="input">
           <span className="caption">Filter spec. actions:</span>
@@ -70,12 +72,12 @@ chrome.runtime.getBackgroundPage( background => {
           <span className="comment">(required for ImmutableJS states)</span>
         </div>
         <div className="input">
-          <span className="caption">Inject in all pages:</span>
+          <span className="caption">Allowed everywhere:</span>
           <input id="inject" type="checkbox" defaultChecked={items.inject} onChange={saveOption}/>
           <span className="comment">(disable to allow only the urls bellow)</span>
         </div>
         <div className="input">
-          <span className="caption">Pages urls to inject DevTools in (regex from new line):</span>
+          <span className="caption">Allowed for the following urls (regex from new line):</span>
           <textarea onChange={saveUrls} id="urls" defaultValue={items.urls}/>
         </div>
         <div className="input">
