@@ -5,7 +5,7 @@ import { isAllowed } from '../options/syncOptions';
 import notifyErrors from '../utils/notifyErrors';
 
 const monitorActions = [
-  'TOGGLE_ACTION', 'SWEEP', 'SET_ACTIONS_ACTIVE',
+  'TOGGLE_ACTION', 'SWEEP', 'SET_ACTIONS_ACTIVE', 'IMPORT_STATE',
   '@@redux-devtools-log-monitor/START_CONSECUTIVE_TOGGLE'
 ];
 
@@ -25,6 +25,7 @@ window.devToolsExtension = function(config = {}) {
   let lastAction;
   let errorOccurred = false;
   let isMonitored = false;
+  let isExcess;
 
   function stringify(obj) {
     return jsan.stringify(obj);
@@ -42,28 +43,26 @@ window.devToolsExtension = function(config = {}) {
     window.postMessage(message, '*');
   }
 
-  function relay(type, state, action, nextActionId, isExcess) {
-    setTimeout(() => {
-      const message = {
-        payload: type === 'STATE' && shouldFilter() ? filterActions(state) : state,
-        action: action || '',
-        nextActionId: nextActionId || '',
-        isExcess,
-        type,
-        source: 'redux-page',
-        name: config.name || document.title
-      };
-      if (shouldSerialize || window.devToolsOptions.serialize) {
+  function relay(type, state, action, nextActionId) {
+    const message = {
+      payload: type === 'STATE' && shouldFilter() ? filterActions(state) : state,
+      action: action || '',
+      nextActionId: nextActionId || '',
+      isExcess,
+      type,
+      source: 'redux-page',
+      name: config.name || document.title
+    };
+    if (shouldSerialize || window.devToolsOptions.serialize) {
+      relaySerialized(message);
+    } else {
+      try {
+        window.postMessage(message, '*');
+      } catch (err) {
         relaySerialized(message);
-      } else {
-        try {
-          window.postMessage(message, '*');
-        } catch (err) {
-          relaySerialized(message);
-          shouldSerialize = true;
-        }
+        shouldSerialize = true;
       }
-    }, 0);
+    }
   }
 
   function onMessage(event) {
@@ -79,6 +78,11 @@ window.devToolsExtension = function(config = {}) {
 
     if (message.type === 'DISPATCH') {
       liftedStore.dispatch(message.payload);
+    } else if (message.type === 'IMPORT') {
+      liftedStore.dispatch({
+        type: 'IMPORT_STATE', nextLiftedState: jsan.parse(message.state)
+      });
+      relay('STATE', liftedStore.getState());
     } else if (message.type === 'UPDATE') {
       relay('STATE', liftedStore.getState());
     } else if (message.type === 'START') {
@@ -157,8 +161,8 @@ window.devToolsExtension = function(config = {}) {
     } else if (!errorOccurred && monitorActions.indexOf(lastAction) === -1) {
       if (lastAction === 'JUMP_TO_STATE' || shouldFilter() && isFiltered(action)) return;
       const { maxAge } = window.devToolsOptions;
-      const isExcess = maxAge && liftedState.stagedActionIds.length === maxAge;
-      relay('ACTION', state, liftedAction, nextActionId, isExcess);
+      relay('ACTION', state, liftedAction, nextActionId);
+      if (!isExcess && maxAge) isExcess = liftedState.stagedActionIds.length >= maxAge;
     } else {
       if (errorOccurred && !liftedState.computedStates[liftedState.currentStateIndex].error) errorOccurred = false;
       relay('STATE', liftedState);
